@@ -18,16 +18,44 @@ class Task_Check(GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     Serializer_class = TaskSerializer
-
+    # to view the Task
     def get(self,request):
         objects = Task.objects.all()
         serializer = TaskSerializer(objects,many=True)
         return Response(serializer.data)
-
+    # to create Task
     def post(self,request):
         data = request.data
         obj = Task.objects.create(title=data['title'],description=data['description'],task=data['task'],status=data['status'])
         return HttpResponse("Object is Created")
+
+    # to remove the task
+    def delete(self,request):
+        try:
+            title = request.GET.get('title')
+            task_obj = Task.objects.filter(id = title)
+            task_obj.delete()
+            return Response({'status':200,'message':'deleted'})
+
+        except Exception as e :
+            return Response({'status':403,'message':'title is not present in DB'})
+
+    # to update the task
+    def patch(self,request):
+        try:
+            task_obj = Task.objects.get(title = request.data['title'])
+
+            serializer = TaskSerializer(task_obj,data=request.data,partial=True)
+            if not serializer.is_valid():
+                return Response({'status':403,'errors':serializer.data, 'message':'Somethings went wrong'})
+            serializer.save()
+            return Response({'status':200,'payload':serializer.data,'message':'your data is saved'})
+
+        except Exception as e:
+            return Response({'status':403,'message':'invalid title '})
+
+
+
 
 
 
