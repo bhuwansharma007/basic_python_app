@@ -8,21 +8,21 @@ from rest_framework.generics import GenericAPIView
 from django.http import HttpResponse
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions  import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 
 
 # Create your views here.
 
 class Task_Check(GenericAPIView):
-    authentication_classes = [IsAuthenticated]
-    permission_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     Serializer_class = TaskSerializer
 
     def get(self,request):
         objects = Task.objects.all()
-        Serializer_class = TaskSerializer(objects,many=True)
-        return Response(serializers.data)
+        serializer = TaskSerializer(objects,many=True)
+        return Response(serializer.data)
 
     def post(self,request):
         data = request.data
